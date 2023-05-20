@@ -1,17 +1,93 @@
+from dash import html, Output, Input, State, dcc
+from dash_extensions.enrich import (DashProxy,
+                                    ServersideOutputTransform,
+                                    MultiplexerTransform)
+import dash_mantine_components as dmc
+from dash.exceptions import PreventUpdate
+from sqlite3 import connect
 import pandas as pd
 import plotly.express as px
-from sqlite3 import connect
 
 
 conn = connect('testDB.db')
 df = pd.read_sql("SELECT * from sources", conn)
 
-data_pie = df[['reason', 'duration_hour']]
-dic = {key: value for key, value in zip(df['reason'], df['color'])}
-print(dic)
-# df_pie = px.pie(
-#     data_frame=data_pie,
-#     values='duration_hour',
-#     names='reason',
-#     color_discrete_map={key: value for key, value in zip(df['reason'], df['color'])})
-# df_pie.show()
+
+color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
+color_list_hex = [i for i in color_dict.values()]
+data_pie = df[['reason', 'duration_hour', 'color']]
+fig_pie = px.pie(
+    data_frame=data_pie,
+    values='duration_hour',
+    names='reason',
+    color_discrete_sequence = color_list_hex,
+)
+
+
+CARD_STYLE = dict(withBorder=True,
+                  shadow="sm",
+                  radius="md",
+                  style={'height': '400px'})
+
+
+class EncostDash(DashProxy):
+    def __init__(self, **kwargs):
+        self.app_container = None
+        super().__init__(transforms=[ServersideOutputTransform(),
+                                     MultiplexerTransform()], **kwargs)
+
+
+app = EncostDash(name=__name__)
+
+
+def get_layout():
+    return html.Div([
+        dmc.Paper([
+            dmc.Grid([
+                dmc.Col([
+                    dmc.Card([
+                        dmc.TextInput(
+                            label='Введите что-нибудь',
+                            id='input'),
+                        dmc.Button(
+                            'Первая кнопка',
+                            id='button1'),
+                        dmc.Button(
+                            'Вторая кнопка',
+                            id='button2'),
+                        html.Div(
+                            id='output')],
+                        **CARD_STYLE)
+                ], span=6),
+                dmc.Col([
+                    dmc.Card([
+                        html.Div(dcc.Graph(
+                            id='example-graph',
+                            figure=fig_pie))],
+                        )
+                ], span=6),
+                dmc.Col([
+                    dmc.Card([
+                        html.Div('Нижняя карточка')],
+                        **CARD_STYLE)
+                ], span=12),
+            ], gutter="xl",)
+        ])
+    ])
+
+app.layout = get_layout
+# app.layout = html.Div(
+#     children=[
+#     html.H1(children='Hello Dash'),
+#
+#     html.Div(children='''
+#         Dash: A web application framework for your data.
+#     '''),
+#
+#     dcc.Graph(
+#         id='example-graph',
+#         figure=df_pie
+#     )])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)

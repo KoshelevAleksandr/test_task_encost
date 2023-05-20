@@ -12,14 +12,16 @@ import plotly.express as px
 conn = connect('../testDB.db')
 df = pd.read_sql("SELECT * from sources", conn)
 
+
+color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
+color_list_hex = [i for i in color_dict.values()]
 data_pie = df[['reason', 'duration_hour', 'color']]
-print(data_pie)
-df_pie = px.pie(
+fig_pie = px.pie(
     data_frame=data_pie,
     values='duration_hour',
     names='reason',
-    color='color',
-    color_discrete_map={key:value for key,duration_hour,value in data_pie})
+    color_discrete_sequence = color_list_hex,
+)
 df_pie.show()
 
 
@@ -62,22 +64,10 @@ def get_layout():
                 ], span=6),
                 dmc.Col([
                     dmc.Card([
-                        html.Div(['Верхняя правая карточка'])],
-                        # html.Div([
-                                 #     html.H4('Analysis of the restaurant sales'),
-                                 #     dcc.Graph(id="graph"),
-                                 #     html.P("Names:"),
-                                 #     dcc.Dropdown(id='names',
-                                 #                  options=['smoker', 'day', 'time', 'sex'],
-                                 #                  value='day', clearable=False
-                                 #                  ),
-                                 #     html.P("Values:"),
-                                 #     dcc.Dropdown(id='values',
-                                 #                  options=['total_bill', 'tip', 'size'],
-                                 #                  value='total_bill', clearable=False
-                                 #                  ),
-                                 # ])],
-                        **CARD_STYLE)
+                        html.Div(dcc.Graph(
+                            id='example-graph',
+                            figure=fig_pie))],
+                        )
                 ], span=6),
                 dmc.Col([
                     dmc.Card([
@@ -90,7 +80,6 @@ def get_layout():
 
 
 app.layout = get_layout()
-# app.layout = html.Div('asd')
 
 @app.callback(
     Output('output', 'children'),
