@@ -64,6 +64,7 @@ def get_layout():
                         html.Div(dcc.Graph(
                             id='example-graph',
                             figure=fig_pie))],
+                        **CARD_STYLE
                         )
                 ], span=6),
                 dmc.Col([
