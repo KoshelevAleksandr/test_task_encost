@@ -2,8 +2,7 @@ import plotly.express as px
 
 
 def get_pie(df):
-    color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
-    color_list_hex = [i for i in color_dict.values()]
+    color_list_hex = df['color'].unique()
     fig_pie = px.pie(
         data_frame=df,
         values='duration_hour',
@@ -20,9 +19,9 @@ def get_pie(df):
     )
     return fig_pie
 
+
 def get_timline(df):
-    color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
-    color_list_hex = [i for i in color_dict.values()]
+    color_list_hex = df['color'].unique()
     fig_timline = px.timeline(
         data_frame=df,
         x_start='state_begin',
@@ -52,12 +51,13 @@ def get_timline(df):
                'tickformat': "%H",
                },
         showlegend=False,
+        # legend_itemclick='toggleothers',
         height=300,
         title={'x': 0.5},
         hoverlabel_bgcolor='white',
         clickmode='select',
         )
-    template_timeline = "<br>".join([
+    template_timeline = '<br>'.join([
             'Состояние - <b>%{customdata[0]}</b>',
             'Причина - <b>%{customdata[1]}</b>',
             'Начало - <b>%{customdata[2]|%H:%M:%S (%d-%m)}</b>',

@@ -6,7 +6,7 @@ import dash_mantine_components as dmc
 from dash.exceptions import PreventUpdate
 from sqlite3 import connect
 import pandas as pd
-import plotly.express as px
+from datetime import datetime
 import figures
 
 
@@ -28,6 +28,9 @@ app = EncostDash(name=__name__)
 conn = connect('../testDB.db')
 df = pd.read_sql("SELECT * from sources", conn)
 
+state_begin = datetime.strptime(df["state_begin"].min(), "%Y-%m-%d %H:%M:%S.%f").strftime("%H:%M:%S (%d.%m)")
+state_end = datetime.strptime(df["state_end"].max(), "%Y-%m-%d %H:%M:%S.%f").strftime("%H:%M:%S (%d.%m)")
+
 
 def get_layout():
     return html.Div([
@@ -35,15 +38,23 @@ def get_layout():
             dmc.Grid([
                 dmc.Col([
                     dmc.Card([
-                        dmc.TextInput(
-                            label='Введите что-нибудь',
-                            id='input'),
+                        html.Div(children=[
+                            html.H1(f'Клиент: {df["client_name"][0]}'),
+                            html.H4([
+                                html.Div(f'Сменный день: {df["shift_day"][0]}'),
+                                html.Div(f'Точка учета: {df["endpoint_name"][0]}'),
+                                html.Div(f'Начало периода: {state_begin}'),
+                                html.Div(f'Конец периода: {state_end}')
+                            ]),
+                            dcc.Dropdown(
+                                df.reason.unique(),
+                                id='input',
+                                multi=True,
+                                placeholder=''),
+                        ]),
                         dmc.Button(
-                            'Первая кнопка',
+                            'Фильтровать',
                             id='button1'),
-                        dmc.Button(
-                            'Вторая кнопка',
-                            id='button2'),
                         html.Div(
                             id='output')],
                         **CARD_STYLE)
@@ -70,26 +81,20 @@ def get_layout():
 
 app.layout = get_layout()
 
+# @app.callback(
+#     Output(component_id='fig_timline', component_property='figure'),
+#     Input(component_id='dropdown-selection', component_property='value')
+# )
+# def update_graph(col_chosen):
+#     pass
+#
+#     return f'Первая кнопка нажата, данные:'
+
+
 @app.callback(
     Output('output', 'children'),
     State('input', 'value'),
     Input('button1', 'n_clicks'),
-    prevent_initial_call=True,
-)
-def update_div1(
-    value,
-    click
-):
-    if click is None:
-        raise PreventUpdate
-
-    return f'Первая кнопка нажата, данные: {value}'
-
-
-@app.callback(
-    Output('output', 'children'),
-    State('input', 'value'),
-    Input('button2', 'n_clicks'),
     prevent_initial_call=True,
 )
 def update_div2(
