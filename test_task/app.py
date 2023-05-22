@@ -28,6 +28,9 @@ app = EncostDash(name=__name__)
 conn = connect('../testDB.db')
 df = pd.read_sql("SELECT * from sources", conn)
 
+client_name = df["client_name"][0]
+shift_day = df["shift_day"][0]
+endpoint_name = df["endpoint_name"][0]
 state_begin = datetime.strptime(df["state_begin"].min(), "%Y-%m-%d %H:%M:%S.%f").strftime("%H:%M:%S (%d.%m)")
 state_end = datetime.strptime(df["state_end"].max(), "%Y-%m-%d %H:%M:%S.%f").strftime("%H:%M:%S (%d.%m)")
 
@@ -39,10 +42,10 @@ def get_layout():
                 dmc.Col([
                     dmc.Card([
                         html.Div(children=[
-                            html.H1(f'Клиент: {df["client_name"][0]}'),
+                            html.H1(f'Клиент: {client_name}'),
                             html.H4([
-                                html.Div(f'Сменный день: {df["shift_day"][0]}'),
-                                html.Div(f'Точка учета: {df["endpoint_name"][0]}'),
+                                html.Div(f'Сменный день: {shift_day}'),
+                                html.Div(f'Точка учета: {endpoint_name}'),
                                 html.Div(f'Начало периода: {state_begin}'),
                                 html.Div(f'Конец периода: {state_end}')
                             ]),
