@@ -16,11 +16,11 @@ fig = px.timeline(
     x_start='state_begin',
     x_end='state_end',
     y='endpoint_name',
-    color='color',
     title='График состояния',
+    color='color',
     color_discrete_sequence=color_list_hex,
     hover_name='reason',
-    # hover_data=['duration_hour'],
+    template='plotly_white',
     custom_data=[
         'state',
         'reason',
@@ -34,7 +34,10 @@ fig = px.timeline(
 )
 fig.update_layout(
     yaxis_title='',
-    xaxis_title='',
+    # xaxis_title='',
+    xaxis={'side': 'top',
+           'title': '',
+           },
     showlegend=False,
     height=300,
     title={'x': 0.5},
@@ -43,15 +46,17 @@ fig.update_layout(
     )
 fig.update_traces(
     hovertemplate="<br>".join([
-        'Состояние - %{customdata[0]}',
-        'Причина - %{customdata[1]}',
-        'Начало - %{customdata[2]}',
-        'Длительность - %{customdata[3]}',
+        'Состояние - <b>%{customdata[0]}</b>',
+        'Причина - <b>%{customdata[1]}</b>',
+        'Начало - <b>%{customdata[2]|%H:%M:%S (%d-%m)}</b>',
+        'Длительность - <b>%{customdata[3]:,.2f}</b>',
         '',
-        'Сменный день - %{customdata[4]}',
-        'Смена - %{customdata[5]}',
-        'Оператор - %{customdata[6]}'
-    ])
+        'Сменный день - <b>%{customdata[4]|%d-%m-%Y}</b>',
+        'Смена - <b>%{customdata[5]}</b>',
+        'Оператор - <b>%{customdata[6]}</b>'
+    ]),
+
+
 )
 fig.show()
 
