@@ -11,7 +11,7 @@ date_tuples = list(df_date.to_records())
 color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
 color_list_hex = [i for i in color_dict.values()]
 
-fig = px.timeline(
+fig_timline = px.timeline(
     data_frame=df,
     x_start='state_begin',
     x_end='state_end',
@@ -32,11 +32,12 @@ fig = px.timeline(
     ]
 
 )
-fig.update_layout(
+fig_timline.update_layout(
     yaxis_title='',
-    # xaxis_title='',
     xaxis={'side': 'top',
            'title': '',
+           'dtick': 3600000,
+           'tickformat': "%H",
            },
     showlegend=False,
     height=300,
@@ -44,7 +45,7 @@ fig.update_layout(
     hoverlabel_bgcolor='white',
     clickmode='select',
     )
-fig.update_traces(
+fig_timline.update_traces(
     hovertemplate="<br>".join([
         'Состояние - <b>%{customdata[0]}</b>',
         'Причина - <b>%{customdata[1]}</b>',
@@ -55,8 +56,6 @@ fig.update_traces(
         'Смена - <b>%{customdata[5]}</b>',
         'Оператор - <b>%{customdata[6]}</b>'
     ]),
-
-
 )
-fig.show()
+fig_timline.show()
 

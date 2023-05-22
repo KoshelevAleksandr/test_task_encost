@@ -7,6 +7,7 @@ from dash.exceptions import PreventUpdate
 from sqlite3 import connect
 import pandas as pd
 import plotly.express as px
+import figures
 
 
 CARD_STYLE = dict(withBorder=True,
@@ -27,18 +28,6 @@ app = EncostDash(name=__name__)
 conn = connect('../testDB.db')
 df = pd.read_sql("SELECT * from sources", conn)
 
-
-color_dict = df[['reason', 'color']].set_index('reason').to_dict()['color']
-color_list_hex = [i for i in color_dict.values()]
-data_pie = df[['reason', 'duration_hour', 'color']]
-
-fig_pie = px.pie(
-    data_frame=df,
-    values='duration_hour',
-    names='reason',
-    color='color',
-    color_discrete_sequence=color_list_hex,
-)
 
 def get_layout():
     return html.Div([
@@ -62,14 +51,16 @@ def get_layout():
                 dmc.Col([
                     dmc.Card([
                         html.Div(dcc.Graph(
-                            id='example-graph',
-                            figure=fig_pie))],
+                            id='fig_pie',
+                            figure=figures.get_pie(df)))],
                         **CARD_STYLE
                         )
                 ], span=6),
                 dmc.Col([
                     dmc.Card([
-                        html.Div('Нижняя карточка')],
+                        html.Div(dcc.Graph(
+                            id='fig_timline',
+                            figure=figures.get_timline(df)))],
                         **CARD_STYLE)
                 ], span=12),
             ], gutter="xl",)
