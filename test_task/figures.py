@@ -22,7 +22,8 @@ def get_pie(df):
 
 def get_timline(df):
     color_list_hex = df['color'].unique()
-    fig_timline = px.timeline(
+    fig_time = px.timeline(
+        opacity=0.3,
         data_frame=df,
         x_start='state_begin',
         x_end='state_end',
@@ -43,7 +44,7 @@ def get_timline(df):
         ]
 
     )
-    fig_timline.update_layout(
+    fig_time.update_layout(
         yaxis_title='',
         xaxis={'side': 'top',
                'title': '',
@@ -55,7 +56,7 @@ def get_timline(df):
         height=300,
         title={'x': 0.5},
         hoverlabel_bgcolor='white',
-        clickmode='select',
+        clickmode='none',
         )
     template_timeline = '<br>'.join([
             'Состояние - <b>%{customdata[0]}</b>',
@@ -67,8 +68,8 @@ def get_timline(df):
             'Смена - <b>%{customdata[5]}</b>',
             'Оператор - <b>%{customdata[6]}</b><extra></extra>'
         ])
-    fig_timline.update_traces(
+    fig_time.update_traces(
         hovertemplate=template_timeline,
 
     )
-    return fig_timline
+    return fig_time

@@ -66,7 +66,9 @@ def get_layout():
                     dmc.Card([
                         html.Div(dcc.Graph(
                             id='fig_pie',
-                            figure=figures.get_pie(df)))],
+                            figure=figures.get_pie(df),
+                            config={'displayModeBar': False}
+                        ))],
                         **CARD_STYLE
                         )
                 ], span=6),
@@ -74,7 +76,9 @@ def get_layout():
                     dmc.Card([
                         html.Div(dcc.Graph(
                             id='fig_timline',
-                            figure=figures.get_timline(df)))],
+                            figure=figures.get_timline(df),
+                            config={'displayModeBar': False}
+                        ))],
                         **CARD_STYLE)
                 ], span=12),
             ], gutter="xl",)
@@ -95,19 +99,22 @@ app.layout = get_layout()
 
 
 @app.callback(
-    Output('output', 'children'),
+    Output('fig_timline', 'figure'),
     State('input', 'value'),
     Input('button1', 'n_clicks'),
     prevent_initial_call=True,
 )
-def update_div2(
-    value,
-    click
-):
+def update_graph(value, click):
+    df = pd.read_sql(f"SELECT * from sources ", conn)
+    df.insert(1, 'visibility', '1')
+    if value:
+        for i in value:
+            df.loc[df['reason'] == i, 'visibility'] = 0.5
+
     if click is None:
         raise PreventUpdate
-
-    return f'Вторая кнопка нажата, данные: {value}'
+    fig = figures.get_timline(df)
+    return fig
 
 
 if __name__ == '__main__':
