@@ -65,9 +65,10 @@ def get_timline(df):
             '',
             'Сменный день - <b>%{customdata[4]|%d-%m-%Y}</b>',
             'Смена - <b>%{customdata[5]}</b>',
-            'Оператор - <b>%{customdata[6]}</b>'
+            'Оператор - <b>%{customdata[6]}</b><extra></extra>'
         ])
     fig_timline.update_traces(
         hovertemplate=template_timeline,
+
     )
     return fig_timline
