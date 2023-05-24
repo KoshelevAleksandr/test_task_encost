@@ -78,7 +78,7 @@ def get_layout():
                         html.Div(dcc.Graph(
                             id='fig_timline',
                             figure=figures.get_timline(df),
-                            config={'displayModeBar': False}
+                            config={'displayModeBar': False},
                         ))],
                         **CARD_STYLE)
                 ], span=12),
@@ -88,6 +88,7 @@ def get_layout():
 
 
 app.layout = get_layout()
+
 
 @app.callback(
     Output('output', 'children'),
