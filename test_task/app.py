@@ -13,7 +13,8 @@ import figures
 CARD_STYLE = dict(withBorder=True,
                   shadow="sm",
                   radius="md",
-                  style={'height': '400px'})
+                  style={'height': '400px',},
+                  )
 
 
 class EncostDash(DashProxy):
@@ -48,13 +49,13 @@ def get_layout():
                                 html.Div(f'Точка учета: {endpoint_name}'),
                                 html.Div(f'Начало периода: {state_begin}'),
                                 html.Div(f'Конец периода: {state_end}')
-                            ]),
-                            dcc.Dropdown(
-                                df.reason.unique(),
-                                id='input',
-                                multi=True,
-                                placeholder=''),
-                        ]),
+                            ])]),
+                        dcc.Dropdown(
+                            df.reason.unique(),
+                            id='input',
+                            multi=True,
+                            placeholder=''),
+
                         dmc.Button(
                             'Фильтровать',
                             id='button1'),
@@ -88,33 +89,20 @@ def get_layout():
 
 app.layout = get_layout()
 
-# @app.callback(
-#     Output(component_id='fig_timline', component_property='figure'),
-#     Input(component_id='dropdown-selection', component_property='value')
-# )
-# def update_graph(col_chosen):
-#     pass
-#
-#     return f'Первая кнопка нажата, данные:'
-
-
 @app.callback(
-    Output('fig_timline', 'figure'),
+    Output('output', 'children'),
     State('input', 'value'),
     Input('button1', 'n_clicks'),
     prevent_initial_call=True,
 )
 def update_graph(value, click):
-    df = pd.read_sql(f"SELECT * from sources ", conn)
-    df.insert(1, 'visibility', '1')
-    if value:
-        for i in value:
-            df.loc[df['reason'] == i, 'visibility'] = 0.5
-
+    # df = pd.read_sql(f"SELECT * from sources ", conn)
+    # df1 = df.loc[df['reason'].isin(value)]
+    # df2 = df.loc[~df['reason'].isin(value)]
     if click is None:
         raise PreventUpdate
-    fig = figures.get_timline(df)
-    return fig
+
+    return f'{value}'
 
 
 if __name__ == '__main__':

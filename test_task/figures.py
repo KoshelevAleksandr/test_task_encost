@@ -17,13 +17,13 @@ def get_pie(df):
     fig_pie.update_traces(
         hovertemplate=template_pie,
     )
+    fig_pie.update_layout()
     return fig_pie
 
 
 def get_timline(df):
     color_list_hex = df['color'].unique()
     fig_time = px.timeline(
-        opacity=0.3,
         data_frame=df,
         x_start='state_begin',
         x_end='state_end',
@@ -52,11 +52,11 @@ def get_timline(df):
                'tickformat': "%H",
                },
         showlegend=False,
-        # legend_itemclick='toggleothers',
         height=300,
         title={'x': 0.5},
         hoverlabel_bgcolor='white',
-        clickmode='none',
+        clickmode='select',
+        boxmode='group'
         )
     template_timeline = '<br>'.join([
             'Состояние - <b>%{customdata[0]}</b>',
